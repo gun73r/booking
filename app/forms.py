@@ -1,10 +1,8 @@
 from django import forms
 
-from .models import Customer, Owner
+from .models import Customer, Owner, Hotel
 
 from functools import partial
-
-
 
 
 class SignUpForm(forms.Form):
@@ -13,9 +11,9 @@ class SignUpForm(forms.Form):
                                            (Owner, 'Owner')))
     username = forms.CharField(max_length=100)
     password = forms.CharField(min_length=6, max_length=32,
-                                widget=forms.PasswordInput)
+                               widget=forms.PasswordInput)
     repeat_password = forms.CharField(min_length=6, max_length=32,
-                                widget=forms.PasswordInput)
+                                      widget=forms.PasswordInput)
     full_name = forms.CharField(max_length=300)
     birth_date = forms.DateField(input_formats='%mm-$dd-%yyyy', widget=DateInput())
     email = forms.EmailField()
@@ -30,3 +28,9 @@ class SignUpForm(forms.Form):
             raise forms.ValidationError('Passwords are not same')
         else:
             return cleaned_data
+
+
+class HotelCreationForm(forms.ModelForm):
+    class Meta:
+        model = Hotel
+        fields = ['name', 'hotel_type', 'description', 'phone', 'location']

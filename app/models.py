@@ -67,11 +67,11 @@ class Hotel(models.Model):
         ('Hostel', 'Hostel'),
     ]
     name = models.CharField(max_length=200)
-    type = models.CharField(max_length=50, choices=TYPES)
+    hotel_type = models.CharField(max_length=50, choices=TYPES)
     location = models.CharField(max_length=20)
-    apartments = models.ForeignKey(Apartments, on_delete=models.CASCADE)
-    comments = models.ForeignKey(Comment, on_delete=models.CASCADE)
-    rate = models.FloatField()
+    apartments = models.ForeignKey(Apartments, on_delete=models.CASCADE, blank=True)
+    comments = models.ForeignKey(Comment, on_delete=models.CASCADE, blank=True)
+    rate = models.FloatField(blank=True)
     description = models.TextField()
     phone = models.CharField(max_length=20)
 
