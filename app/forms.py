@@ -1,33 +1,66 @@
 from django import forms
+from django.contrib.auth.hashers import PBKDF2PasswordHasher
+from django.db import IntegrityError
 
-from .models import Customer, Owner, Hotel
+
+from .models import Customer, Owner, Hotel, Image
+from booking import settings
 
 from functools import partial
+from datetime import datetime
 
 
 class SignUpForm(forms.Form):
     DateInput = partial(forms.DateInput, {'class': 'datepicker'})
-    user_type = forms.ChoiceField(choices=((Customer, 'Customer'),
-                                           (Owner, 'Owner')))
+    user_type = forms.ChoiceField(choices=(('customer', 'Customer'),
+                                           ('owner', 'Owner')))
     username = forms.CharField(max_length=100)
     password = forms.CharField(min_length=6, max_length=32,
                                widget=forms.PasswordInput)
     repeat_password = forms.CharField(min_length=6, max_length=32,
                                       widget=forms.PasswordInput)
     full_name = forms.CharField(max_length=300)
-    birth_date = forms.DateField(input_formats='%mm-$dd-%yyyy', widget=DateInput())
+    birth_date = forms.DateField(input_formats=('%m/%d/%Y',), widget=DateInput())
     email = forms.EmailField()
     phone = forms.CharField(max_length=20)
-    profile_image = forms.ImageField(required=False)    
-    
+    profile_image = forms.ImageField(required=False)
+
     def clean(self):
-        cleaned_data = self.cleaned_data
-        password = cleaned_data.get('password')
-        repeat_password = cleaned_data.get('repeat_password')
+        super(SignUpForm, self).clean()
+        password = self.cleaned_data.get('password')
+        repeat_password = self.cleaned_data.get('repeat_password')
         if password != repeat_password:
-            raise forms.ValidationError('Passwords are not same')
-        else:
-            return cleaned_data
+            self.add_error('repeat_password', 'Passwords must match')
+
+    def save(self):
+        cd = self.cleaned_data
+        username = cd.get('username')
+        password = cd.get('password').encode('utf-8')
+        password_hash = PBKDF2PasswordHasher().encode(password,
+                                                      settings.SECRET_KEY)
+        full_name = cd.get('full_name')
+        birth_date = cd.get('birth_date')
+        email = cd.get('email')
+        phone = cd.get('phone')
+        image = cd.get('profile_image')
+
+        user = None
+        try:
+            if cd.get('user_type') == 'customer':
+                user = Customer(username=username, password=password_hash,
+                                full_name=full_name, birth_date=birth_date, email=email,
+                                phone=phone)
+            elif self.cleaned_data.get('user_type') == 'owner':
+                user = Owner(username=username, password=password_hash,
+                             full_name=full_name, birth_date=birth_date, email=email,
+                             phone=phone)
+            if user is not None and image is not None:
+                image = Image(photo=image, pub_date=datetime.now())
+                user.profile_image = image
+                image.save()
+            user.save()
+        except IntegrityError:
+            self.add_error('image', 'all fields should be unique')
 
 
 class HotelCreationForm(forms.ModelForm):

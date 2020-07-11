@@ -9,13 +9,13 @@ from .models import User
 
 class SignUpView(View):
     def get(self, request):
-        form = SignUpForm(request.POST)
+        form = SignUpForm()
         return render(request, 'signup.html', {'form': form})
 
     def post(self, request):
         form = SignUpForm(request.POST)
-        form.clean()
-        print(form.errors)
+        if form.is_valid():
+            form.save()
         return redirect('/signup')
 
 

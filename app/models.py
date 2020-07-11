@@ -7,14 +7,14 @@ class Image(models.Model):
 
 
 class User(models.Model):
-    username = models.CharField(max_length=100)
-    password = models.CharField(max_length=64)
+    username = models.CharField(max_length=100, unique=True)
+    password = models.CharField(max_length=128)
     full_name = models.CharField(max_length=300)
     birth_date = models.DateField()
-    email = models.EmailField()
-    phone = models.CharField(max_length=20)
+    email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=20, unique=True)
     credit_card = models.CharField(max_length=4, blank=True)
-    profile_image = models.ForeignKey(Image, on_delete=models.CASCADE)
+    profile_image = models.ForeignKey(Image, on_delete=models.CASCADE, null=True)
 
     class Meta:
         abstract = True
