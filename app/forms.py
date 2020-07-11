@@ -31,6 +31,17 @@ class SignUpForm(forms.Form):
 
 
 class HotelCreationForm(forms.ModelForm):
+    def save(self, **kwargs):
+        cd = self.cleaned_data
+        name = cd.get('name')
+        hotel_type = cd.get('hotel_type')
+        location = cd.get('location')
+        description = cd.get('description')
+        phone = cd.get('phone')
+        hotel = Hotel(name=name, hotel_type=hotel_type, location=location, description=description, phone=phone)
+        hotel.save()
+        return hotel
+
     class Meta:
         model = Hotel
         fields = ['name', 'hotel_type', 'description', 'phone', 'location']

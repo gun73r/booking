@@ -19,13 +19,19 @@ class SignUpView(View):
         return redirect('/signup')
 
 
-# @login_required
-# @owner_required
 class HotelCreation(View):
+    @login_required
+    @owner_required
     def get(self, request):
         form = HotelCreationForm()
         return render(request, 'hotel_creation.html', {'form': form})
 
+    @login_required
+    @owner_required
     def post(self, request):
         form = HotelCreationForm(request.POST)
-        return render(request, 'hotel_creation.html', {'form': form})
+        if form.is_valid():
+            hotel_pk = form.save()
+            return redirect('/hotel/{}'.format(hotel_pk))
+        else:
+            return render(request, 'hotel_creation.html', {'form': form})
