@@ -40,7 +40,7 @@ class Apartments(models.Model):
         ('Hostel_Room', 'Hostel room'),
     ]
     name = models.CharField(max_length=200)
-    location = models.CharField(max_length=20)
+    location = models.CharField(max_length=50)
     photos = models.ForeignKey(Image, on_delete=models.CASCADE)
     cost = models.CharField(max_length=50)
     room_amount = models.PositiveSmallIntegerField()
@@ -61,17 +61,17 @@ class Order(models.Model):
 
 class Hotel(models.Model):
     TYPES = [
-        ('Hotel', 'Hotel'),
-        ('Motel', 'Motel'),
-        ('Apartments', 'Apartments'),
-        ('Hostel', 'Hostel'),
+        ('ht', 'Hotel'),
+        ('mt', 'Motel'),
+        ('ap', 'Apartments'),
+        ('hs', 'Hostel'),
     ]
     name = models.CharField(max_length=200)
-    type = models.CharField(max_length=50, choices=TYPES)
-    location = models.CharField(max_length=20)
-    apartments = models.ForeignKey(Apartments, on_delete=models.CASCADE)
-    comments = models.ForeignKey(Comment, on_delete=models.CASCADE)
-    rate = models.FloatField()
+    hotel_type = models.CharField(max_length=50, choices=TYPES)
+    location = models.CharField(max_length=50)
+    apartments = models.ForeignKey(Apartments, on_delete=models.CASCADE, blank=True, null=True)
+    comments = models.ForeignKey(Comment, on_delete=models.CASCADE, blank=True, null=True)
+    rate = models.FloatField(blank=True, null=True)
     description = models.TextField()
     phone = models.CharField(max_length=20)
 
