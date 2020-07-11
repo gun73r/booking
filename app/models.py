@@ -8,6 +8,11 @@ class Image(models.Model):
 
 
 class User(DjangoUser):
+    TYPES = [
+        ('OWNER', 'Owner'),
+        ('CUSTOMER', 'Customer'),
+    ]
+    user_type = models.CharField(max_length=10, choices=TYPES)
     birth_date = models.DateField()
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20, unique=True)
